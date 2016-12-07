@@ -49,6 +49,8 @@ def load_inverted_index():
         for entry in index:
             entry = re.sub("[(,)>-]", "", entry)
             data = entry.split()
+            if data[0] in common_words:
+                continue
             inverted_index[data[0]] = {}
             for x in range(1,len(data)):
                 if(x%2 == 0):
@@ -118,7 +120,7 @@ def bm25_score_calculation(avdl):
 
 
 def write_results_to_file(score_map):
-    file_h = open("cacm_query_bm25.txt","w")
+    file_h = open("cacm_query_bm25_stop.txt","w")
     for i in range (1,len(query_map)+1):
         sorted_docs = sorted(score_map[str(i)].items(), key=operator.itemgetter(1),reverse = True)
 
@@ -134,10 +136,10 @@ def write_results_to_file(score_map):
 
 
 if __name__ == '__main__':
-    load_inverted_index()
+    
     load_common_words()
+    load_inverted_index()
     load_queries()
-    print(common_words)
 
     avdl = calculate_avdl()
 
