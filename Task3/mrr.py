@@ -16,6 +16,7 @@ import operator
 
 precisiondict = {}
 recalldict = {}
+Reciprocalrank = {}
 
 def create_set_rel_irre(f):
     mapping_dict = {}
@@ -40,17 +41,22 @@ def calculateprecision(relevantset , irrelevantset):
         rel_till = 0.0
         precisiondict[key] = []
         recalldict[key] = []
+        First_Relevant_found = False
         irrelevantvalues = irrelevantset[key]
         relevantvalues = relevantset[key]
         total_rel_doc = len(relevantvalues)
         for curr_doc in irrelevantvalues:
             total_till = total_till + 1
             if curr_doc in relevantvalues:
+                if not First_Relevant_found:
+                    recirank = 1 / total_till
+                    Reciprocalrank[key] = recirank
+                    First_Relevant_found = True
                 rel_till = rel_till + 1
-                precision = rel_till / total_till
-                recall = rel_till / total_rel_doc
-                precisiondict[key].append(precision)
-                recalldict[key].append(recall)
+            precision = rel_till / total_till
+            recall = rel_till / total_rel_doc
+            precisiondict[key].append(precision)
+            recalldict[key].append(recall)
 
 
 if __name__ == "__main__":
@@ -59,4 +65,6 @@ if __name__ == "__main__":
     f = open('retres.txt', 'r')
     irrelevantset = create_set_rel_irre(f)
     precisiondict = calculateprecision(relevantset , irrelevantset)
+    print precisiondict
     print recalldict
+    print Reciprocalrank
