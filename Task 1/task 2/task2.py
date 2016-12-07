@@ -6,6 +6,10 @@ inverted_index ={}
 dl_map = {}
 query_map = {}
 
+score_square_denom = {}
+non_inverted_index = {}
+doc_term_score = {}
+
 k1 = 1.2
 k2 = 100.0
 b = 0.75
@@ -43,18 +47,51 @@ def clean_text(text):
     return text
 
 def load_inverted_index():
-    with open('inverted_index.txt') as index:
-        #print(index)
-        for entry in index:
-            entry = re.sub("[(,)>-]", "", entry)
-            data = entry.split()
-            inverted_index[data[0]] = {}
-            for x in range(1,len(data)):
-                if(x%2 == 0):
-                    continue
-                else:
-                    inverted_index[data[0]][data[x]]=data[x+1]
-                make_dl_map(data[x],int(data[x+1]))
+    file_h = open("inverted_index.txt","r")
+    #print(len(file_h.readlines()))
+    for entry in file_h.readlines():
+        entry = re.sub("[(,)>-]", "", entry)
+        data = entry.split()
+        inverted_index[data[0]] = {}
+
+        term = data[0]
+        idf = math.log(3204/len(data))
+        
+        for x in range(1,len(data)):
+            if(x%2 == 0):
+                continue
+            else:
+                inverted_index[data[0]][data[x]]=data[x+1]
+            make_dl_map(data[x],int(data[x+1]))
+            doc = data[x]
+            fik = int(data[x+1])
+            
+            #term weight denominator calculation 
+            norm_denom = math.pow(((math.log(fik) + 1) * idf),2)
+            if doc in score_square_denom:
+                score_square_denom [doc] += norm_denom
+            else:
+                score_square_denom[doc] = norm_denom
+
+            #make a non-inverted index
+            if doc in non_inverted_index:
+                non_inverted_index[doc][term] = fik
+            else:
+                curr = {term:fik}
+                non_inverted_index[doc] = curr
+
+
+def calculate_dij():
+    for doc in non_inverted_index:
+        doc_term_score[doc] = {}
+        for term in non_inverted_index[doc]:
+            idf = math.log(3204/len(inverted_index[term]))
+            fik = float(non_inverted_index[doc][term])
+            score_numer = (math.log(fik) + 1) * idf
+            score = score_numer/math.sqrt(score_square_denom[doc])
+
+            doc_term_score[doc][term] = score
+            
 
 def load_queries():
     with open("cacm.queries.txt") as query_list:
@@ -126,8 +163,12 @@ def write_results_to_file(score_map):
     file_h.close()
     
 
-def main():
+def bm25():
     load_inverted_index()
+
+    calculate_dij()
+    print(doc_term_score['0001'])
+    
     load_queries()
 
     avdl = calculate_avdl()
@@ -137,8 +178,9 @@ def main():
     write_results_to_file(score_map)
 
 
-main()
-    
+bm25()
+
+
     
 
 
