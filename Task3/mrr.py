@@ -17,6 +17,7 @@ import operator
 precisiondict = {}
 recalldict = {}
 Reciprocalrank = {}
+Averageprecision = {}
 
 def create_set_rel_irre(f):
     mapping_dict = {}
@@ -39,6 +40,8 @@ def calculateprecision(relevantset , irrelevantset):
     for key in irrelevantset:
         total_till = 0.0
         rel_till = 0.0
+        Precision_sum = 0
+        curr_doc_type = False
         precisiondict[key] = []
         recalldict[key] = []
         First_Relevant_found = False
@@ -48,23 +51,28 @@ def calculateprecision(relevantset , irrelevantset):
         for curr_doc in irrelevantvalues:
             total_till = total_till + 1
             if curr_doc in relevantvalues:
+                curr_doc_type = True
                 if not First_Relevant_found:
                     recirank = 1 / total_till
                     Reciprocalrank[key] = recirank
                     First_Relevant_found = True
                 rel_till = rel_till + 1
             precision = rel_till / total_till
+            if curr_doc_type:
+                Precision_sum = Precision_sum + precision
             recall = rel_till / total_rel_doc
             precisiondict[key].append(precision)
             recalldict[key].append(recall)
-
+            curr_doc_type = False
+        Averageprecision[key] = Precision_sum / total_rel_doc
 
 if __name__ == "__main__":
     f = open('cacm.txt', 'r')
     relevantset = create_set_rel_irre(f)
     f = open('retres.txt', 'r')
     irrelevantset = create_set_rel_irre(f)
-    precisiondict = calculateprecision(relevantset , irrelevantset)
+    calculateprecision(relevantset , irrelevantset)
     print precisiondict
     print recalldict
     print Reciprocalrank
+    print Averageprecision
