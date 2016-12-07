@@ -14,6 +14,9 @@ import operator
 ## 1 is the query id and doc1 etc are the relevant documents
 ## the same is done for the irrelevant documents
 
+precisiondict = {}
+recalldict = {}
+
 def create_set_rel_irre(f):
     mapping_dict = {}
     for line in f:
@@ -28,20 +31,26 @@ def create_set_rel_irre(f):
     return mapping_dict
 
 def calculateprecision(relevantset , irrelevantset):
-    precisiondict = {}
+    ## precisiondict will have key as query id and its list of
+    ## precision at each relevant document achieved
+    ## same is applicable for the recalldict
+
     for key in irrelevantset:
         total_till = 0.0
         rel_till = 0.0
         precisiondict[key] = []
+        recalldict[key] = []
         irrelevantvalues = irrelevantset[key]
         relevantvalues = relevantset[key]
+        total_rel_doc = len(relevantvalues)
         for curr_doc in irrelevantvalues:
             total_till = total_till + 1
             if curr_doc in relevantvalues:
                 rel_till = rel_till + 1
                 precision = rel_till / total_till
+                recall = rel_till / total_rel_doc
                 precisiondict[key].append(precision)
-    return precisiondict
+                recalldict[key].append(recall)
 
 
 if __name__ == "__main__":
@@ -50,3 +59,4 @@ if __name__ == "__main__":
     f = open('retres.txt', 'r')
     irrelevantset = create_set_rel_irre(f)
     precisiondict = calculateprecision(relevantset , irrelevantset)
+    print recalldict
