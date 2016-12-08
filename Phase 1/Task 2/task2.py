@@ -128,7 +128,16 @@ def get_term_ri(query_no,term,R,sorted_score_map):
             ri += 1
     return ri
     
-
+def get_initial_ri(query_no,term):
+    ri = 0.0
+    if query_no not in relavent_documents:
+        return ri
+    for doc_rel in relavent_documents[query_no]:
+        if len(doc_rel) < 4:
+            print(doc_rel)
+        if term in non_inverted_index[doc_rel]:
+            ri += 1.0
+    return ri
 
 def query_score_computation(score_map,ids,avdl,R,sorted_score_map):
     N = len(dl_map)
@@ -155,7 +164,11 @@ def query_score_computation(score_map,ids,avdl,R,sorted_score_map):
                             if len(sorted_score_map) > 0:
                                 ri = float(get_term_ri(ids,q,R,sorted_score_map))
                             else:
-                                ri = 0.0
+                                ri = get_initial_ri(ids,q)
+                                if ids not in relavent_documents:
+                                    R = 0.0
+                                else:
+                                    R = float(len(relavent_documents[ids]))
                             numer = (ri+0.5)/(R-ri+0.5)
                             denom = (ni-ri+0.5)/(N-ni-R+ri+0.5)
                         
@@ -255,7 +268,7 @@ def calculate_new_query_scores(sorted_score_map,R):
             at += 1
             if at == 20:
                 break
-        break
+        
         
         
             
@@ -284,16 +297,31 @@ def write_results_to_file2(score_map):
         rank = 1
 
         for doc_score_tuple in sorted_docs:
-            file_h.write(str(i)+" Q0 "+str(doc_score_tuple[0])+" "+str(rank)+" "+str(doc_score_tuple[1])+" BM25\n")
+            file_h.write(str(i)+" Q0 "+"CACM-"+str(doc_score_tuple[0])+" "+str(rank)+" "+str(doc_score_tuple[1])+" BM25\n")
             rank += 1
 
             if rank > 100:
                 break
     file_h.close()
 
+relavent_documents = {}
+
+def load_relavtive_docs():
+    with open('cacm.rel.txt') as doc_list:
+        for entry in doc_list:
+            words = entry.split()
+            q_id = words[0]
+            if q_id not in relavent_documents:
+                relavent_documents[q_id] = ['{0:04}'.format(int(words[2].lstrip('CACM-')))]
+            else:
+                relavent_documents[q_id].append('{0:04}'.format(int(words[2].lstrip('CACM-'))))
+
+
 def bm25():
+    load_relavtive_docs()
+    print(relavent_documents['1'])
     load_inverted_index()
-    
+
     calculate_dij()
     
     #print(doc_term_score['0001'])
