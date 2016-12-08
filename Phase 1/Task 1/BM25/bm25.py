@@ -46,10 +46,19 @@ def load_inverted_index():
     with open('inverted_index.txt') as index:
         #print(index)
         for entry in index:
-            entry = re.sub("[(,)>-]", "", entry)
-            data = entry.split()
-            inverted_index[data[0]] = {}
-            for x in range(1,len(data)):
+            index_term = entry.split("->")
+            term_list = index_term[0].split()
+
+            term = term_list[0]
+            
+            inverted_index[term] = {}
+            data = []
+            data.append(term)
+            
+            args = re.sub("[(,)>-]", "", index_term[1])
+            data = data + args.split()
+            
+            for x in range(1,len(data)-1):
                 if(x%2 == 0):
                     continue
                 else:
