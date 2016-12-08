@@ -14,14 +14,15 @@ denominator_for_docs = {}
 def load_inverted_index(inverted_index):
     with open('inverted_index.txt') as index:
         for entry in index:
+            word = entry.split("->")[0].strip(' ')
             entry = re.sub("[(,)>-]", "", entry)
             data = entry.split()
-            inverted_index[data[0]] = {}
+            inverted_index[word] = {}
             for x in xrange(1,len(data)-1):
                 if(x%2 == 0):
                     continue
                 else:
-                    inverted_index[data[0]][data[x]]=data[x+1]
+                    inverted_index[word][data[x]]=data[x+1]
 
 def calculate_denominator(denominator_for_docs):
     for x in xrange(1,int(N)+1):
@@ -127,7 +128,7 @@ if __name__ == '__main__':
             rank = 1
             for i in sort_pr:
                 if rank <= 100: #query_id   Q0  doc_id  rank    CosineSim_score system_name
-                    f.write(query_ID + ' Q0 ' + \
+                    f.write(query_ID + ' Q0 ' + 'CACM-' +\
                     str(i[0])+' '+str(rank)+' '+str(i[1])+\
                     ' TFIDF\n')
                 rank += 1
