@@ -6,6 +6,8 @@ import re
 import sys
 import glob
 import operator
+import csv
+import collections
 
 ## in the below code we are creating a relevantset
 ## each of the key will be the query_id
@@ -19,18 +21,21 @@ recalldict = {}
 Reciprocalrank = {}
 Averageprecision = {}
 
-def create_set_rel_irre(f):
+def create_set_rel(f,setboolean):
     mapping_dict = {}
     for line in f:
         templist = line.split()
         key = templist[0]
         value = templist[2]
+        if setboolean:
+            value = value[5:]
         if key not in mapping_dict:
             mapping_dict[key] = []
             mapping_dict[key].append(value)
         else:
             mapping_dict[key].append(value)
     return mapping_dict
+
 
 def calculateprecision(relevantset , irrelevantset):
     ## precisiondict will have key as query id and its list of
@@ -42,11 +47,14 @@ def calculateprecision(relevantset , irrelevantset):
         rel_till = 0.0
         Precision_sum = 0
         curr_doc_type = False
+        if key in relevantset:
+                relevantvalues = relevantset[key]
+        else:
+            continue
         precisiondict[key] = []
         recalldict[key] = []
         First_Relevant_found = False
         irrelevantvalues = irrelevantset[key]
-        relevantvalues = relevantset[key]
         total_rel_doc = len(relevantvalues)
         for curr_doc in irrelevantvalues:
             total_till = total_till + 1
@@ -67,12 +75,22 @@ def calculateprecision(relevantset , irrelevantset):
         Averageprecision[key] = Precision_sum / total_rel_doc
 
 if __name__ == "__main__":
+    SetBoolean = True
     f = open('cacm.txt', 'r')
-    relevantset = create_set_rel_irre(f)
+    relevantset = create_set_rel(f , SetBoolean)
+    SetBoolean = False
     f = open('retres.txt', 'r')
-    irrelevantset = create_set_rel_irre(f)
-    calculateprecision(relevantset , irrelevantset)
+    irrelevantset = create_set_rel(f, SetBoolean)
+    calculateprecision(relevantset ,irrelevantset)
+    Sortedprecdict = collections.OrderedDict(sorted(precisiondict.items()))
+    Sortedrecalldict = collections.OrderedDict(sorted(recalldict.items()))
+    '''
     print precisiondict
     print recalldict
     print Reciprocalrank
     print Averageprecision
+    '''
+    with open('precisiondict.csv', 'w') as f:
+        c = csv.writer(f)
+        for key, value in Sortedprecdict.items():
+            c.writerow([key] + value)
