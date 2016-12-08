@@ -52,14 +52,19 @@ def load_inverted_index():
     i = 0
     for entry in file_h.readlines():
         #entry = re.sub("[(,)>-]", "", entry)
-        data = entry.split("->")
-        data[0] = data[0].split()
+        index_term = entry.split("->")
+        term_list = index_term[0].split()
+
+        term = term_list[0]
         
-        inverted_index[data[0]] = {}
-            
-        term = data[0]
-        print(len(term))
-        idf = math.log(3204/len(data))
+        inverted_index[term] = {}
+        data = []
+        data.append(term)
+        
+        args = re.sub("[(,)>-]", "", index_term[1])
+        data = data + args.split()
+        
+        idf = math.log(3204/(len(data)-1))
         
         for x in range(1,len(data)):
             
@@ -113,6 +118,7 @@ def load_queries():
                 term = clean_text(term)
                 query.append(term)
             query_map[query_id] = query
+            
 
 def get_term_ri(query_no,term,R,sorted_score_map):
     ri = 0
@@ -287,11 +293,9 @@ def write_results_to_file2(score_map):
 
 def bm25():
     load_inverted_index()
-    print(inverted_index['timesharing'])
+    
     calculate_dij()
-    #for doc in non_inverted_index:
-    #    if 'timesharing' in non_inverted_index[doc]:
-    #       print(doc)
+    
     #print(doc_term_score['0001'])
     
     load_queries()
