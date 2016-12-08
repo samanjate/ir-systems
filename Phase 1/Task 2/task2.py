@@ -49,21 +49,28 @@ def clean_text(text):
 def load_inverted_index():
     file_h = open("inverted_index.txt","r")
     #print(len(file_h.readlines()))
+    i = 0
     for entry in file_h.readlines():
-        entry = re.sub("[(,)>-]", "", entry)
-        data = entry.split()
+        #entry = re.sub("[(,)>-]", "", entry)
+        data = entry.split("->")
+        data[0] = data[0].split()
+        
         inverted_index[data[0]] = {}
-
+            
         term = data[0]
+        print(len(term))
         idf = math.log(3204/len(data))
         
         for x in range(1,len(data)):
+            
             if(x%2 == 0):
                 continue
             else:
                 inverted_index[data[0]][data[x]]=data[x+1]
+                
             make_dl_map(data[x],int(data[x+1]))
             doc = data[x]
+            
             fik = int(data[x+1])
             
             #term weight denominator calculation 
@@ -74,6 +81,8 @@ def load_inverted_index():
                 score_square_denom[doc] = norm_denom
 
             #make a non-inverted index
+            #if term == 'timesharing':
+            #print(term)
             if doc in non_inverted_index:
                 non_inverted_index[doc][term] = fik
             else:
@@ -105,8 +114,17 @@ def load_queries():
                 query.append(term)
             query_map[query_id] = query
 
+def get_term_ri(query_no,term,R,sorted_score_map):
+    ri = 0
+    for rank in range(1,R+1):
+        doc_rel = sorted_score_map[query_no][rank]
+        if term in non_inverted_index[doc_rel]:
+            ri += 1
+    return ri
+    
 
-def query_score_computation(score_map,ids,avdl):
+
+def query_score_computation(score_map,ids,avdl,R,sorted_score_map):
     N = len(dl_map)
     # for each term in a query
     for term in query_map[ids]:
@@ -128,22 +146,28 @@ def query_score_computation(score_map,ids,avdl):
 
                             qfi = float(query_map[ids].count(q))
                             qf_component = ((k2 + 1) * qfi)/(k2+qfi)
-
-                            term_score += math.log((1/((ni+0.5)/(N-ni+0.5)))*tf_component*qf_component)
+                            if len(sorted_score_map) > 0:
+                                ri = float(get_term_ri(ids,q,R,sorted_score_map))
+                            else:
+                                ri = 0.0
+                            numer = (ri+0.5)/(R-ri+0.5)
+                            denom = (ni-ri+0.5)/(N-ni-R+ri+0.5)
+                        
+                            term_score += math.log(numer/denom)*tf_component*qf_component
 
                 score_map[ids][doc] = term_score
-    
+        
 
 
 
-def bm25_score_calculation(avdl):
+def bm25_score_calculation(avdl,R,sorted_score_map):
 
     score_map = {}
 
     for x in range(1,len(query_map)+1):
         ids = str(x)
         score_map[ids] = {}
-        query_score_computation(score_map,ids,avdl)
+        query_score_computation(score_map,ids,avdl,R,sorted_score_map)
     return score_map
 
 
@@ -225,6 +249,7 @@ def calculate_new_query_scores(sorted_score_map,R):
             at += 1
             if at == 20:
                 break
+        break
         
         
             
@@ -262,7 +287,11 @@ def write_results_to_file2(score_map):
 
 def bm25():
     load_inverted_index()
+    print(inverted_index['timesharing'])
     calculate_dij()
+    #for doc in non_inverted_index:
+    #    if 'timesharing' in non_inverted_index[doc]:
+    #       print(doc)
     #print(doc_term_score['0001'])
     
     load_queries()
@@ -271,8 +300,9 @@ def bm25():
         print(query_no+" "+str(len(query_map[query_no])))'''
         
     avdl = calculate_avdl()
-    
-    score_map = bm25_score_calculation(avdl)
+    R = 0
+    sorted_score_map = {}
+    score_map = bm25_score_calculation(avdl,R,sorted_score_map)
     sorted_score_map = sort_score_map(score_map)
     write_results_to_file(score_map)
     #print(sorted_score_map['1'])
@@ -284,7 +314,7 @@ def bm25():
         query_no = str(q)
         print(query_no+" "+str(len(query_map[query_no])))'''
 
-    score_map = bm25_score_calculation(avdl)
+    score_map = bm25_score_calculation(avdl,R,sorted_score_map)
     sorted_score_map = sort_score_map(score_map)
     write_results_to_file2(score_map)
     
