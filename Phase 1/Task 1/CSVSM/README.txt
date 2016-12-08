@@ -10,4 +10,4 @@ to run the file.
 
 The output of the program will be the cacm_queries_csvsm.txt file.
 
-The output of the program was recorded in 2391.952 seconds to run.
+The output of the program was recorded in 53.059 seconds.
