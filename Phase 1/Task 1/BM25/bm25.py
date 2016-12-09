@@ -5,6 +5,7 @@ import operator
 inverted_index ={}
 dl_map = {}
 query_map = {}
+non_inverted_index = {}
 
 k1 = 1.2
 k2 = 100.0
@@ -64,6 +65,14 @@ def load_inverted_index():
                 else:
                     inverted_index[data[0]][data[x]]=data[x+1]
                 make_dl_map(data[x],int(data[x+1]))
+                doc = data[x]
+                fik = int(data[x+1])
+
+                if doc in non_inverted_index:
+                    non_inverted_index[doc][term] = fik
+                else:
+                    curr = {term:fik}
+                    non_inverted_index[doc] = curr
 
 def load_queries():
     with open("cacm.queries.txt") as query_list:
@@ -76,6 +85,17 @@ def load_queries():
                 term = clean_text(term)
                 query.append(term)
             query_map[query_id] = query
+
+def get_initial_ri(query_no,term):
+    ri = 0.0
+    if query_no not in relavent_documents:
+        return ri
+    for doc_rel in relavent_documents[query_no]:
+        if len(doc_rel) < 4:
+            print(doc_rel)
+        if term in non_inverted_index[doc_rel]:
+            ri += 1.0
+    return ri
 
 
 def query_score_computation(score_map,ids,avdl):
@@ -101,7 +121,15 @@ def query_score_computation(score_map,ids,avdl):
                             qfi = float(query_map[ids].count(q))
                             qf_component = ((k2 + 1) * qfi)/(k2+qfi)
 
-                            term_score += math.log((1/((ni+0.5)/(N-ni+0.5)))*tf_component*qf_component)
+                            ri = get_initial_ri(ids,q)
+                            if ids not in relavent_documents:
+                                R = 0.0
+                            else:
+                                R = float(len(relavent_documents[ids]))
+                            numer = (ri+0.5)/(R-ri+0.5)
+                            denom = (ni-ri+0.5)/(N-ni-R+ri+0.5)
+                        
+                            term_score += math.log(numer/denom)*tf_component*qf_component
 
                 score_map[ids][doc] = term_score
     
@@ -127,20 +155,39 @@ def write_results_to_file(score_map):
         rank = 1
 
         for doc_score_tuple in sorted_docs:
-            file_h.write(str(i)+" Q0 "+str(doc_score_tuple[0])+" "+str(rank)+" "+str(doc_score_tuple[1])+" BM25\n")
+            file_h.write(str(i)+" Q0 "+"CACM-"+str(doc_score_tuple[0])+" "+str(rank)+" "+str(doc_score_tuple[1])+" BM25\n")
             rank += 1
 
             if rank > 100:
                 break
     file_h.close()
-    
+
+
+relavent_documents = {}
+
+
+def load_relavant_docs():
+    with open('cacm.rel.txt') as doc_list:
+        for entry in doc_list:
+            words = entry.split()
+            q_id = words[0]
+            if q_id not in relavent_documents:
+                relavent_documents[q_id] = ['{0:04}'.format(int(words[2].lstrip('CACM-')))]
+            else:
+                relavent_documents[q_id].append('{0:04}'.format(int(words[2].lstrip('CACM-'))))
+
 
 def main():
+
+    load_relavant_docs()
+    
     load_inverted_index()
     load_queries()
 
     avdl = calculate_avdl()
     
+    R = 0
+    sorted_score_map = {}
     score_map = bm25_score_calculation(avdl)
 
     write_results_to_file(score_map)

@@ -306,7 +306,7 @@ def write_results_to_file2(score_map):
 
 relavent_documents = {}
 
-def load_relavtive_docs():
+def load_relavant_docs():
     with open('cacm.rel.txt') as doc_list:
         for entry in doc_list:
             words = entry.split()
@@ -318,7 +318,7 @@ def load_relavtive_docs():
 
 
 def bm25():
-    load_relavtive_docs()
+    load_relavant_docs()
     print(relavent_documents['1'])
     load_inverted_index()
 

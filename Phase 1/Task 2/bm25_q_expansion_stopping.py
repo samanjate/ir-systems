@@ -280,14 +280,14 @@ def calculate_new_query_scores(sorted_score_map,R):
     
 
 def write_results_to_file(score_map):
-    file_h = open("acm_queries_bm25_stop.txt","w")
+    file_h = open("cacm_queries_bm25_stop.txt","w")
     for i in range (1,len(query_map)+1):
         sorted_docs = sorted(score_map[str(i)].items(), key=operator.itemgetter(1),reverse = True)
 
         rank = 1
 
         for doc_score_tuple in sorted_docs:
-            file_h.write(str(i)+" Q0 "+str(doc_score_tuple[0])+" "+str(rank)+" "+str(doc_score_tuple[1])+" BM25\n")
+            file_h.write(str(i)+" Q0 "+"CACM-"+str(doc_score_tuple[0])+" "+str(rank)+" "+str(doc_score_tuple[1])+" BM25\n")
             rank += 1
 
             if rank > 100:
@@ -295,7 +295,7 @@ def write_results_to_file(score_map):
     file_h.close()
     
 def write_results_to_file2(score_map):
-    file_h = open("acm_queries_bm25_stop_qe.txt","w")
+    file_h = open("cacm_queries_bm25_stop_qe.txt","w")
     for i in range (1,len(query_map)+1):
         sorted_docs = sorted(score_map[str(i)].items(), key=operator.itemgetter(1),reverse = True)
 

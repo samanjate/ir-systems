@@ -6,6 +6,7 @@ import os
 inverted_index ={}
 dl_map = {}
 query_map = {}
+non_inverted_index = {}
 
 k1 = 1.2
 k2 = 100.0
@@ -44,18 +45,35 @@ def clean_text(text):
     return text
 
 def load_inverted_index():
-    with open('inverted_index_stem.txt') as index:
+    with open('inverted_index.txt') as index:
         #print(index)
         for entry in index:
-            entry = re.sub("[(,)>-]", "", entry)
-            data = entry.split()
-            inverted_index[data[0]] = {}
-            for x in range(1,len(data)):
+            index_term = entry.split("->")
+            term_list = index_term[0].split()
+
+            term = term_list[0]
+            
+            inverted_index[term] = {}
+            data = []
+            data.append(term)
+            
+            args = re.sub("[(,)>-]", "", index_term[1])
+            data = data + args.split()
+            
+            for x in range(1,len(data)-1):
                 if(x%2 == 0):
                     continue
                 else:
                     inverted_index[data[0]][data[x]]=data[x+1]
                 make_dl_map(data[x],int(data[x+1]))
+                doc = data[x]
+                fik = int(data[x+1])
+
+                if doc in non_inverted_index:
+                    non_inverted_index[doc][term] = fik
+                else:
+                    curr = {term:fik}
+                    non_inverted_index[doc] = curr
 
 def load_queries():
     f = open("cacm_stem_temp.query.txt",'a')
@@ -84,6 +102,17 @@ def load_queries():
                 query.append(term)
             query_map[query_id] = query
 
+            
+def get_initial_ri(query_no,term):
+    ri = 0.0
+    if query_no not in relavent_documents:
+        return ri
+    for doc_rel in relavent_documents[query_no]:
+        if len(doc_rel) < 4:
+            print(doc_rel)
+        if term in non_inverted_index[doc_rel]:
+            ri += 1.0
+    return ri
 
 def query_score_computation(score_map,ids,avdl):
     N = len(dl_map)
@@ -108,12 +137,18 @@ def query_score_computation(score_map,ids,avdl):
                             qfi = float(query_map[ids].count(q))
                             qf_component = ((k2 + 1) * qfi)/(k2+qfi)
 
-                            term_score += math.log((1/((ni+0.5)/(N-ni+0.5)))*tf_component*qf_component)
+                            ri = get_initial_ri(ids,q)
+                            if ids not in relavent_documents:
+                                R = 0.0
+                            else:
+                                R = float(len(relavent_documents[ids]))
+                            numer = (ri+0.5)/(R-ri+0.5)
+                            denom = (ni-ri+0.5)/(N-ni-R+ri+0.5)
+                        
+                            term_score += math.log(numer/denom)*tf_component*qf_component
 
                 score_map[ids][doc] = term_score
     
-
-
 
 def bm25_score_calculation(avdl):
 
@@ -127,27 +162,45 @@ def bm25_score_calculation(avdl):
 
 
 def write_results_to_file(score_map):
-    file_h = open("cacm_query_bm25_stem.txt","w")
+    file_h = open("cacm_query_bm25.txt","w")
     for i in range (1,len(query_map)+1):
         sorted_docs = sorted(score_map[str(i)].items(), key=operator.itemgetter(1),reverse = True)
 
         rank = 1
 
         for doc_score_tuple in sorted_docs:
-            file_h.write(str(i)+" Q0 "+str(doc_score_tuple[0])+" "+str(rank)+" "+str(doc_score_tuple[1])+" BM25\n")
+            file_h.write(str(i)+" Q0 "+"CACM-"+str(doc_score_tuple[0])+" "+str(rank)+" "+str(doc_score_tuple[1])+" BM25\n")
             rank += 1
 
             if rank > 100:
                 break
     file_h.close()
+
     
+relavent_documents = {}
+
+def load_relavant_docs():
+    with open('cacm.rel.txt') as doc_list:
+        for entry in doc_list:
+            words = entry.split()
+            q_id = words[0]
+            if q_id not in relavent_documents:
+                relavent_documents[q_id] = ['{0:04}'.format(int(words[2].lstrip('CACM-')))]
+            else:
+                relavent_documents[q_id].append('{0:04}'.format(int(words[2].lstrip('CACM-'))))
+
+
 
 if __name__ == '__main__':
+    load_relavant_docs()
+    
     load_inverted_index()
     load_queries()
 
     avdl = calculate_avdl()
     
+    R = 0
+    sorted_score_map = {}
     score_map = bm25_score_calculation(avdl)
 
     write_results_to_file(score_map)
