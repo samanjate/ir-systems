@@ -5,11 +5,17 @@ import operator
 inverted_index ={}
 dl_map = {}
 query_map = {}
+non_inverted_index = {}
 common_words = []
 
 k1 = 1.2
 k2 = 100.0
 b = 0.75
+
+def load_common_words():
+    with open("common_words.txt") as words:
+        for word in words:
+            common_words.append(word.split()[0])
 
 def make_dl_map(doc,freq):
     if doc in dl_map:
@@ -47,22 +53,32 @@ def load_inverted_index():
     with open('inverted_index.txt') as index:
         #print(index)
         for entry in index:
-            entry = re.sub("[(,)>-]", "", entry)
-            data = entry.split()
-            if data[0] in common_words:
-                continue
-            inverted_index[data[0]] = {}
-            for x in range(1,len(data)):
+            index_term = entry.split("->")
+            term_list = index_term[0].split()
+
+            term = term_list[0]
+
+            inverted_index[term] = {}
+            data = []
+            data.append(term)
+
+            args = re.sub("[(,)>-]", "", index_term[1])
+            data = data + args.split()
+
+            for x in range(1,len(data)-1):
                 if(x%2 == 0):
                     continue
                 else:
                     inverted_index[data[0]][data[x]]=data[x+1]
                 make_dl_map(data[x],int(data[x+1]))
+                doc = data[x]
+                fik = int(data[x+1])
 
-def load_common_words():
-    with open("common_words.txt") as words:
-        for word in words:
-            common_words.append(word.split()[0])
+                if doc in non_inverted_index:
+                    non_inverted_index[doc][term] = fik
+                else:
+                    curr = {term:fik}
+                    non_inverted_index[doc] = curr
 
 def load_queries():
     with open("cacm.queries.txt") as query_list:
@@ -73,9 +89,19 @@ def load_queries():
             query = []
             for term in query_terms[1:]:
                 term = clean_text(term)
-                if term not in common_words:
-                    query.append(term)
+                query.append(term)
             query_map[query_id] = query
+
+def get_initial_ri(query_no,term):
+    ri = 0.0
+    if query_no not in relavent_documents:
+        return ri
+    for doc_rel in relavent_documents[query_no]:
+        if len(doc_rel) < 4:
+            print(doc_rel)
+        if term in non_inverted_index[doc_rel]:
+            ri += 1.0
+    return ri
 
 
 def query_score_computation(score_map,ids,avdl):
@@ -101,7 +127,15 @@ def query_score_computation(score_map,ids,avdl):
                             qfi = float(query_map[ids].count(q))
                             qf_component = ((k2 + 1) * qfi)/(k2+qfi)
 
-                            term_score += math.log((1/((ni+0.5)/(N-ni+0.5)))*tf_component*qf_component)
+                            ri = get_initial_ri(ids,q)
+                            if ids not in relavent_documents:
+                                R = 0.0
+                            else:
+                                R = float(len(relavent_documents[ids]))
+                            numer = (ri+0.5)/(R-ri+0.5)
+                            denom = (ni-ri+0.5)/(N-ni-R+ri+0.5)
+
+                            term_score += math.log(numer/denom)*tf_component*qf_component
 
                 score_map[ids][doc] = term_score
 
@@ -127,7 +161,7 @@ def write_results_to_file(score_map):
         rank = 1
 
         for doc_score_tuple in sorted_docs:
-            file_h.write(str(i)+" Q0 "+str(doc_score_tuple[0])+" "+str(rank)+" "+str(doc_score_tuple[1])+" BM25\n")
+            file_h.write(str(i)+" Q0 "+"CACM-"+str(doc_score_tuple[0])+" "+str(rank)+" "+str(doc_score_tuple[1])+" BM25\n")
             rank += 1
 
             if rank > 100:
@@ -135,14 +169,35 @@ def write_results_to_file(score_map):
     file_h.close()
 
 
-if __name__ == '__main__':
-    
-    load_common_words()
+relavent_documents = {}
+
+
+def load_relavant_docs():
+    with open('cacm.rel.txt') as doc_list:
+        for entry in doc_list:
+            words = entry.split()
+            q_id = words[0]
+            if q_id not in relavent_documents:
+                relavent_documents[q_id] = ['{0:04}'.format(int(words[2].lstrip('CACM-')))]
+            else:
+                relavent_documents[q_id].append('{0:04}'.format(int(words[2].lstrip('CACM-'))))
+
+
+def main():
+
+    load_common_words
+    load_relavant_docs()
+
     load_inverted_index()
     load_queries()
 
     avdl = calculate_avdl()
 
+    R = 0
+    sorted_score_map = {}
     score_map = bm25_score_calculation(avdl)
 
     write_results_to_file(score_map)
+
+
+main()
