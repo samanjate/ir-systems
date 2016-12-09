@@ -92,23 +92,27 @@ def load_relavtive_docs():
 
 if __name__ == "__main__":
     relevantset = load_relavtive_docs()
+    ## give path for the query file for the retrieval model
+    ##  for which you wanna calculate evalaution metrics.
     f = open('cacm_queries_bm25_stop.txt', 'r')
     irrelevantset = create_set_rel(f)
     calculateprecision(relevantset ,irrelevantset)
     Sortedprecdict = collections.OrderedDict(sorted(precisiondict.items()))
     Sortedrecalldict = collections.OrderedDict(sorted(recalldict.items()))
     
-    '''
+    ## file name where you want to store the data for precision
     with open('precision_dict_cacm_queries_bm25_stop.csv', 'w') as f:
         c = csv.writer(f)
         for key, value in Sortedprecdict.items():
             c.writerow([key] + value)
 
+    ## file name where you want to store the data for recall
     with open('recall_dict_cacm_queries_bm25_stop.csv', 'w') as f:
         c = csv.writer(f)
         for key, value in Sortedrecalldict.items():
             c.writerow([key] + value)
 
+    ## file name where you to store the MAP ,MRR and precision at 5th and 20 th rank 
     with open('MRR_BM25_stop.txt', 'w') as f:
         sum_reciprocal = 0.0
         sum_precision = 0.0
@@ -138,4 +142,4 @@ if __name__ == "__main__":
             f.write("For Query id:"+ " " + str(key[0]) + " ")
             f.write("precision at 20th rank is: "+ "->" + '\t')
             f.write(str(prec19)+"\n")
-    '''
+    
