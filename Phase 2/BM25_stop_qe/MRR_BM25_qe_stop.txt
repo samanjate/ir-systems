@@ -1,5 +1,5 @@
-Mean average precision for BM25 with stopping and query expansion is ->	0.327837835933
-Mean reciprocal rank for BM25 with stopping and query expansion is ->	0.729759556683
+Mean average precision for BM25 with query expansion and stopping ->	0.327837835933
+Mean reciprocal rank for BM25 with query expansion and stopping  ->	0.729759556683
 For Query id: 1 precision at 5th rank is: ->	0.2
 For Query id: 1 precision at 20th rank is: ->	0.1
 For Query id: 2 precision at 5th rank is: ->	0.4

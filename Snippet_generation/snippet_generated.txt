@@ -3,10 +3,10 @@ What articles exist which deal with TSS (Time Sharing System), an operating syst
 
 SNIPPETS:
 
-An Experimental Comparison of TIME SHARING and Batch Processing The effectiveness for program development of the MIT Compatible Time-Sharing SYSTEM (CTSS)  was compared with that of the IBM IBSYS batch-processing SYSTEM by means of a statistically designed  experimentAn identical set of four programming problems was assigned to each of a group of four programming  subjects 
+An Experimental Comparison of TIME SHARING and Batch Processing. The effectiveness for program development of the MIT Compatible TIME-SHARING SYSTEM (CTSS)  was compared with that of the IBM IBSYS batch-processing SYSTEM by means of a statistically designed  experiment.An identical set of four programming problems was assigned to each of a group of four programming  subjects 
 CACM-1605
 
-GEORGE 3-A General Purpose TIME SHARING and OPERATING System1900, and can handle a large number of online console users while at the same TIME running several  off line (background) jobs An OPERATING SYSTEM is described which will run on a wide variety of configurations of the  I 
+GEORGE 3-A General Purpose TIME SHARING and OPERATING System1900, and can handle a large number of online console users while at the same TIME running several  off line (background) jobs An OPERATING SYSTEM is described which will run on a wide variety of configurations of the  I …
 CACM-1519
 
 Experimental Personalized Array Translator SYSTEM A SYSTEM designed for intimate man-machine interaction in a general-purpose problem-solving  environment is experimentally operationalThe SYSTEM utilizers an array-oriented symbolic source language  containing powerful statement types 
@@ -33,40 +33,7 @@ CACM-0585
 A SYSTEM for Interprocess Communicationin a Resource SHARING Computer Networkinterprocess communication, time-sharing, computer networks, resource SHARING  3 A SYSTEM of communication between processes in a time-sharing SYSTEM is described and the communication  SYSTEM is extended so that it may be used between processes distributed throughout a computer network 
 CACM-2371
 
-QUERY:
-I am interested in articles written either by Prieve or Udo Pooch Prieve, B. Pooch, U. 
 
-SNIPPETS:
-
-Analysis of the Availability of ComputerSystems Using Computer- Aided Algebra Analytical results, related to the availability of a computer system constructed of unreliable  processors, are presented in this paperThese results are obtained by using various computer-aided  algebraic manipulation techniques 
-CACM-3078
-
-Using Page Residency To Select the Working Set Parameter Denning's method for selecting the working set parameter, which uses interreference intervals,  is examinedSeveral omissions in his model are noted, and new assumptions are introduced to overcome  these omissions 
-CACM-2434
-
-VMIN-An Optimal Variable-Space Page Replacement Algorithm A criterion for comparing variable space page replacement algorithms is presentedAn optimum  page replacement algorithm, called VMIN, is described and shown to be optimum with respect to this criterion 
-CACM-2863
-
-Optimal Storage Allocation for Serial Files A computer system uses several serial filesThe files reside on a  direct-access storage device in which storage space is limited 
-CACM-3129
-
-Mathematical Experimentation in Time-Lag Modulation Equations of the form du/dt = g(u(t),u(h(t))) arise in a number of scientific contextsThe  authors point out some interesting properties of the solution u'(t) = -u(t-1-k*sin(wt))+sin(at) 
-CACM-1364
-
-An Interactive Display for Approximation by Linear Programming An interactive program with a graphical display has been developed for the approximation of data by means of a linear combination of functions (including splines) selected by the userThe coefficients of the approximation are determined by linear programming so as to minimize the error in either the L1 or L-infinity norm 
-CACM-1977
-
-An Information Algebra - Phase I Report-LanguageStructure Group of the CODASYL Development Committee This report represents the results of the first phase of the work of the Language Structure  GroupThe goal of this work is to arrive at a proper structure for a machine-independent problem-defining  language, at the systems level of data processing 
-CACM-0616
-
-Price/Performance Patterns of U. Computer Systems Econometric models of the Ucomputer market have been developed to study  the relationships between system price and hardware performance 
-CACM-3136
-
-Computer Methods for Sampling from the Exponentialand Normal Distributions (Corrigendum) CACM December, 1972  Ahrens, JH 
-CACM-2250
-
-A Multiuser Computation Facility for Education and Research Present-day computing facilities are limited in their value for scientific research by inability  to interact strongly with usersThe full power of a research computing instrument should be available  at many terminals that give each user the ability to generate, correct and operate any procedure he wishes,  either simple or complex 
-CACM-1010
 
 QUERY:
 Intermediate languages used in construction of multi-targeted compilers; TCOLL 
@@ -592,6 +559,41 @@ CACM-2904
 
 Indirect Threaded CODE An efficient arrangement for interpretive CODE is describedIt is related to Bell's notion  of threaded CODE but requires less space and is more amenable to MACHINE independent implementations 
 CACM-2748
+
+QUERY:
+I am interested in articles written either by Prieve or Udo Pooch Prieve, B. Pooch, U. 
+
+SNIPPETS:
+
+Analysis of the Availability of ComputerSystems Using Computer- Aided Algebra Analytical results, related to the availability of a computer system constructed of unreliable  processors, are presented in this paperThese results are obtained by using various computer-aided  algebraic manipulation techniques 
+CACM-3078
+
+Using Page Residency To Select the Working Set Parameter Denning's method for selecting the working set parameter, which uses interreference intervals,  is examinedSeveral omissions in his model are noted, and new assumptions are introduced to overcome  these omissions 
+CACM-2434
+
+VMIN-An Optimal Variable-Space Page Replacement Algorithm A criterion for comparing variable space page replacement algorithms is presentedAn optimum  page replacement algorithm, called VMIN, is described and shown to be optimum with respect to this criterion 
+CACM-2863
+
+Optimal Storage Allocation for Serial Files A computer system uses several serial filesThe files reside on a  direct-access storage device in which storage space is limited 
+CACM-3129
+
+Mathematical Experimentation in Time-Lag Modulation Equations of the form du/dt = g(u(t),u(h(t))) arise in a number of scientific contextsThe  authors point out some interesting properties of the solution u'(t) = -u(t-1-k*sin(wt))+sin(at) 
+CACM-1364
+
+An Interactive Display for Approximation by Linear Programming An interactive program with a graphical display has been developed for the approximation of data by means of a linear combination of functions (including splines) selected by the userThe coefficients of the approximation are determined by linear programming so as to minimize the error in either the L1 or L-infinity norm 
+CACM-1977
+
+An Information Algebra - Phase I Report-LanguageStructure Group of the CODASYL Development Committee This report represents the results of the first phase of the work of the Language Structure  GroupThe goal of this work is to arrive at a proper structure for a machine-independent problem-defining  language, at the systems level of data processing 
+CACM-0616
+
+Price/Performance Patterns of U. Computer Systems Econometric models of the Ucomputer market have been developed to study  the relationships between system price and hardware performance 
+CACM-3136
+
+Computer Methods for Sampling from the Exponentialand Normal Distributions (Corrigendum) CACM December, 1972  Ahrens, JH 
+CACM-2250
+
+A Multiuser Computation Facility for Education and Research Present-day computing facilities are limited in their value for scientific research by inability  to interact strongly with usersThe full power of a research computing instrument should be available  at many terminals that give each user the ability to generate, correct and operate any procedure he wishes,  either simple or complex 
+CACM-1010
 
 QUERY:
 Languages and compilers for parallel processors, especially highly horizontal microcoded machines; code compaction 
