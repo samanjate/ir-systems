@@ -98,7 +98,6 @@ if __name__ == "__main__":
     Sortedprecdict = collections.OrderedDict(sorted(precisiondict.items()))
     Sortedrecalldict = collections.OrderedDict(sorted(recalldict.items()))
     
-    '''
     with open('precision_dict_cacm_queries_bm25_stop.csv', 'w') as f:
         c = csv.writer(f)
         for key, value in Sortedprecdict.items():
@@ -138,4 +137,4 @@ if __name__ == "__main__":
             f.write("For Query id:"+ " " + str(key[0]) + " ")
             f.write("precision at 20th rank is: "+ "->" + '\t')
             f.write(str(prec19)+"\n")
-    '''
+    
