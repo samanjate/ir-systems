@@ -269,8 +269,9 @@ def calculate_new_query_scores(sorted_score_map,R):
         
         for term_score in sorted_term_scores:
             #print(str(at)+" "+term_score[0]+" "+str(term_score[1]))
-            query_map[query_no].append(term_score[0])
-            at += 1
+            if term_score[0] not in query_map[query_no]:
+                query_map[query_no].append(term_score[0])
+                at += 1
             if at == 20:
                 break
         
@@ -350,7 +351,7 @@ def bm25():
     #print(sorted_score_map['1'])
 
     #pseudo relevance - docs above rank R are assumed to be relevant
-    R = 50
+    R = 5
     calculate_new_query_scores(sorted_score_map,R)
     '''for q in range(1,len(query_map)+1):
         query_no = str(q)
