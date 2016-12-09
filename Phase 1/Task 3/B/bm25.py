@@ -45,7 +45,7 @@ def clean_text(text):
     return text
 
 def load_inverted_index():
-    with open('inverted_index.txt') as index:
+    with open('inverted_index_stem.txt') as index:
         #print(index)
         for entry in index:
             index_term = entry.split("->")
