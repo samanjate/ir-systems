@@ -264,9 +264,10 @@ def calculate_new_query_scores(sorted_score_map,R):
         
         for term_score in sorted_term_scores:
             #print(str(at)+" "+term_score[0]+" "+str(term_score[1]))
-            query_map[query_no].append(term_score[0])
-            at += 1
-            if at == 20:
+            if term_score[0] not in query_map[query_no]:
+                query_map[query_no].append(term_score[0])
+                at += 1
+            if at == 10:
                 break
         
         
