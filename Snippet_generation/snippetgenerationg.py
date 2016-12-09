@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import urllib2
 import time
-import os
+import os.path
 import re
 import sys
 import glob
@@ -15,9 +15,10 @@ from nltk.tokenize import TweetTokenizer
 from collections import Counter
 
 common_words = []
+query_id_map = {}
 
 def parseddoc(doc_id):
-    doc_id = "CACM" + "-" + doc_id + ".html"
+    doc_id = doc_id + ".html"
     return doc_id
 
 ## below fucnction will get the title for
@@ -84,19 +85,40 @@ def calculate_sen_score(Word_count_map , Sentences):
         Sentence_Score[index] = sent_score
     return Sentence_Score
 
+def load_query_id():
+    with open('cacm.queries.txt') as doc_list:
+        for entry in doc_list:
+            words = entry.split()
+            q_id = int(words[0])
+            String= ""
+            for x in range(1, len(words)):
+                String = String + words[x] + " "
+            query_id_map[q_id] = String
 
+def load_retrieved_results():
+    with open('cacm_queries_bm25.txt') as f:
+        mapping_dict = {}
+        for line in f:
+            templist = line.split()
+            key = templist[0]
+            key = int(key)
+            value = templist[2]
+            if key not in mapping_dict:
+                mapping_dict[key] = []
+                mapping_dict[key].append(value)
+            else:
+                mapping_dict[key].append(value)
+    return mapping_dict
 
-
-if __name__ == "__main__":
-    load_common_words()
+def generate_snippet(query_text,document_id):
     Word_count_map = {}
     Token_count_map = {}
     Finalstring = ""
-    doc_id = "1134"
+    doc_id = document_id
     tknzr = TweetTokenizer()
     Sentences = []
     FinalSnippet = ""
-    query = " Intermediate languages used in construction of multi-targeted compilers; TCOLL"
+    query = query_text
     ## splitting the query into the query terms and making all of them lowercase
     queryset = tknzr.tokenize(query)
     if ',' in queryset:
@@ -129,11 +151,9 @@ if __name__ == "__main__":
 
         ## got all the subsequent sentences i.e the one after the first sentence
         Sentences = get_Sentences(a)
-        print Sentences
         ## getting the query terms whihc are present in the set of tokes
         ## for the given  query and given document
         u = set.intersection(queryset, tokenset)
-        print u
         for token in tokens:
           if token in Token_count_map:
               val = Token_count_map[token]
@@ -147,6 +167,7 @@ if __name__ == "__main__":
          ## snippet generation.
 
           if (freq > 1 and freq <= 3):
+              word = word.lower()
               Word_count_map[word] = freq
 
     if len(Sentences) > 2:
@@ -157,12 +178,31 @@ if __name__ == "__main__":
     else:
         for x in range(0 ,len(Sentences)-1):
             FinalSnippet = FinalSnippet + Sentences[x]
+
     TempFinalSnippet = FinalSnippet.split(' ')
     FinalSnippet = ""
     for word in TempFinalSnippet:
-        if word in Word_count_map:
+        if word.lower() in queryset:
             word = word.upper()
             FinalSnippet = FinalSnippet + word + " "
         else:
             FinalSnippet = FinalSnippet + word + " "
-    print FinalSnippet
+
+    return FinalSnippet
+
+if __name__ == "__main__":
+    load_common_words()
+    load_query_id()
+    Query_to_doc = load_retrieved_results()
+    with open('snippet_generated.txt' , 'w' ) as f:
+        for key in query_id_map:
+            query_text = query_id_map[key]
+            doc_list = Query_to_doc[key]
+            f.write("QUERY:"+"\n")
+            f.write(query_text + "\n" + "\n")
+            f.write("SNIPPETS:"+ "\n" +"\n")
+            for x in range(0 , 10):
+                doc_id = doc_list[x]
+                Generated_snippet = generate_snippet(query_text , doc_id)
+                f.write(Generated_snippet + "\n"+ doc_id+ "\n")
+                f.write("\n")
